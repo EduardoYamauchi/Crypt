@@ -49,6 +49,12 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 void UGrabber::Release()
 {
+	UPhysicsHandleComponent* PhysicsHandle = GetPhysicasHandle();
+	if (PhysicsHandle == nullptr) {
+		return;
+	}
+
+	PhysicsHandle->ReleaseComponent();
 	UE_LOG(LogTemp, Display, TEXT("Released grabber"));
 }
 
@@ -80,8 +86,12 @@ void UGrabber::Grab()
 	);
 
 	if (HasHit) {
+		// Wake the component hitted.
+		UPrimitiveComponent* HitComponent = HitResult.GetComponent();
+		HitComponent->WakeAllRigidBodies();
+
 		PhysicsHandle->GrabComponentAtLocationWithRotation(
-			HitResult.GetComponent(),
+			HitComponent,
 			NAME_None,
 			HitResult.ImpactPoint,
 			GetComponentRotation()
