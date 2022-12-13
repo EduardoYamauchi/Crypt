@@ -4,25 +4,37 @@
 
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
+#include "Mover.h"
 #include "TriggerComponent.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class CRYPT_API UTriggerComponent : public UBoxComponent
 {
 	GENERATED_BODY()
-	
+
 public:
 	// Sets default values for this component's properties
 	UTriggerComponent();
 
-public:
-	// Called every frame
-	 void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+public:
+	// Called every frame
+	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UFUNCTION(BlueprintCallable)
+	void SetMover(UMover* Mover);
+
+private:
+	UPROPERTY(EditAnywhere)
+	FName AcceptableActorTag;
+
+	UMover* Mover;
+
+	AActor* GetAcceptableActor() const;
 };

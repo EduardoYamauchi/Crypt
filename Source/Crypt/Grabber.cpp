@@ -14,7 +14,6 @@ UGrabber::UGrabber()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
 // Called when the game starts
 void UGrabber::BeginPlay()
 {
