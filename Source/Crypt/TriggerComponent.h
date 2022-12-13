@@ -14,8 +14,15 @@ class CRYPT_API UTriggerComponent : public UBoxComponent
 {
 	GENERATED_BODY()
 	
+public:
+	// Sets default values for this component's properties
+	UTriggerComponent();
+
+public:
+	// Called every frame
+	 void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
 };
