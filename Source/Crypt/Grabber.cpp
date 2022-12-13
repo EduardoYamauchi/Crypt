@@ -12,8 +12,6 @@ UGrabber::UGrabber()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
@@ -43,19 +41,11 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		return;
 	}
 
-	FVector TargetLocation = GetComponentLocation() + GetForwardVector() * HoldDistance;
-	PhysicsHandle->SetTargetLocationAndRotation(TargetLocation, GetComponentRotation());
-}
-
-void UGrabber::Release()
-{
-	UPhysicsHandleComponent* PhysicsHandle = GetPhysicasHandle();
-	if (PhysicsHandle == nullptr) {
-		return;
+	// Just pick, if can.
+	if (PhysicsHandle->GetGrabbedComponent() != nullptr) {
+		FVector TargetLocation = GetComponentLocation() + GetForwardVector() * HoldDistance;
+		PhysicsHandle->SetTargetLocationAndRotation(TargetLocation, GetComponentRotation());
 	}
-
-	PhysicsHandle->ReleaseComponent();
-	UE_LOG(LogTemp, Display, TEXT("Released grabber"));
 }
 
 void UGrabber::Grab()
@@ -65,27 +55,11 @@ void UGrabber::Grab()
 		return;
 	}
 
-	FVector Start = GetComponentLocation();
-	FVector End = Start + GetForwardVector() * MaxGrabDistance;
-	DrawDebugLine(GetWorld(), Start, End, FColor::Red);
-	DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5);
-
-	// Create a sphere radius 
-	FCollisionShape Sphere = FCollisionShape::MakeSphere(GrabRadius);
-
 	FHitResult HitResult;
+	bool HasHit = GetGrabbableInReach(HitResult);
 
-	// Pick information about the Trace channel target.
-	bool HasHit = GetWorld()->SweepSingleByChannel(
-		HitResult,
-		Start,
-		End,
-		FQuat::Identity,
-		ECC_GameTraceChannel2,
-		Sphere
-	);
-
-	if (HasHit) {
+	if (HasHit)
+	{
 		// Wake the component hitted.
 		UPrimitiveComponent* HitComponent = HitResult.GetComponent();
 		HitComponent->WakeAllRigidBodies();
@@ -99,6 +73,20 @@ void UGrabber::Grab()
 	}
 }
 
+void UGrabber::Release()
+{
+	UPhysicsHandleComponent* PhysicsHandle = GetPhysicasHandle();
+	if (PhysicsHandle == nullptr) {
+		return;
+	}
+
+	// Just release if have something to release.
+	if (PhysicsHandle->GetGrabbedComponent() != nullptr) {
+		PhysicsHandle->ReleaseComponent();
+	}
+}
+
+
 UPhysicsHandleComponent* UGrabber::GetPhysicasHandle() const {
 
 	UPhysicsHandleComponent* Result = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
@@ -108,5 +96,26 @@ UPhysicsHandleComponent* UGrabber::GetPhysicasHandle() const {
 	}
 
 	return Result;
+}
+
+bool UGrabber::GetGrabbableInReach(FHitResult& OutHitResult) const {
+
+	FVector Start = GetComponentLocation();
+	FVector End = Start + GetForwardVector() * MaxGrabDistance;
+	DrawDebugLine(GetWorld(), Start, End, FColor::Red);
+	DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5);
+
+	// Create a sphere radius 
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(GrabRadius);
+
+	// Pick information about the Trace channel target.
+	return GetWorld()->SweepSingleByChannel(
+		OutHitResult,
+		Start,
+		End,
+		FQuat::Identity,
+		ECC_GameTraceChannel2,
+		Sphere
+	);
 }
 
