@@ -21,6 +21,16 @@ void UTriggerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 	if (Actor != nullptr)
 	{
+		// Get by cast.
+		UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(Actor->GetRootComponent());
+
+		// Deactive the Physics component.
+		if (Component != nullptr) {
+			Component->SetSimulatePhysics(false);
+		}
+
+		// Apply the same physics to the actor component (mimitize).
+		Actor->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 		Mover->SetShouldMove(true);
 	}
 	else
