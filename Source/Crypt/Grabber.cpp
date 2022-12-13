@@ -63,6 +63,9 @@ void UGrabber::Grab()
 		UPrimitiveComponent* HitComponent = HitResult.GetComponent();
 		HitComponent->WakeAllRigidBodies();
 
+		// Add a tag to the component.
+		HitResult.GetActor()->Tags.Add("Grabbed");
+
 		PhysicsHandle->GrabComponentAtLocationWithRotation(
 			HitComponent,
 			NAME_None,
@@ -81,6 +84,12 @@ void UGrabber::Release()
 
 	// Just release if have something to release.
 	if (PhysicsHandle->GetGrabbedComponent() != nullptr) {
+
+		AActor* GrabbedActor = PhysicsHandle->GetGrabbedComponent()->GetOwner();
+
+		// Remove tag from the component.
+		GrabbedActor->Tags.Remove("Grabbed");
+
 		PhysicsHandle->ReleaseComponent();
 	}
 }
@@ -101,8 +110,6 @@ bool UGrabber::GetGrabbableInReach(FHitResult& OutHitResult) const {
 
 	FVector Start = GetComponentLocation();
 	FVector End = Start + GetForwardVector() * MaxGrabDistance;
-	DrawDebugLine(GetWorld(), Start, End, FColor::Red);
-	DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5);
 
 	// Create a sphere radius 
 	FCollisionShape Sphere = FCollisionShape::MakeSphere(GrabRadius);
