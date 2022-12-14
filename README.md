@@ -1,4 +1,4 @@
-﻿_### **Crypt Explorer - DEMO**
+﻿### **Crypt Explorer - DEMO**
 
 In this game, the player is tasked with exploring a mysterious crypt and solving its puzzles to uncover its secrets. As they move through the crypt, they will encounter hidden traps, challenging puzzles, and eerie creatures that they must overcome in order to progress. Along the way, they will uncover clues and collect items that will help them unlock the crypt's deepest secrets and uncover its hidden treasure. Can you survive the dangers of the crypt and unlock its secrets?
 
